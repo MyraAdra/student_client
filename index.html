@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Student API Client</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      background: #fafafa;
+    }
+    h1 { color: #333; }
+    label { display: inline-block; width: 80px; }
+    input { margin-bottom: 8px; }
+    button { margin: 5px; padding: 6px 12px; cursor: pointer; }
+    pre {
+      background: #eee;
+      padding: 10px;
+      border: 1px solid #ccc;
+      white-space: pre-wrap;
+    }
+    .btn_remove 
+    {
+        color:red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Student API Client</h1>
+
+  <div>
+    <label>Name:</label>
+    <input id="name" placeholder="Enter name" /><br>
+    <label>Uni:</label>
+    <input id="uni" placeholder="Enter uni" /><br>
+  </div>
+
+  <div>
+    <button type="button" onclick="getStudents()">GET All</button>
+    <button type="button" onclick="addStudent()">POST Add</button>
+    <button type="button" onclick="updateStudent()">PUT Update</button>
+    <button type="button" onclick="deleteStudent()">DELETE Remove</button>
+  </div>
+
+  <h3>Response:</h3>
+  <ul id="students"></ul>
+  <pre id="output"></pre>
+  
+
+  <script>
+    const API = 'http://localhost:3000/students';
+    //const API = 'https://api-6tf3.onrender.com/students';
+    const output = document.getElementById('output');
+
+    async function getStudents() {
+      try {        
+        const res = await fetch(API);
+        const data = await res.json();
+        output.textContent = '';
+        output.textContent = JSON.stringify(data, null, 2);
+
+        let students_ul = document.getElementById('students');
+        students_ul.innerHTML = '';
+        data.forEach(s => {
+            let li = document.createElement('li');
+            li.innerHTML = s.name;
+
+            let btn = document.createElement('button');
+            btn.innerHTML = 'X';
+            btn.className = 'btn_remove';
+            btn.addEventListener('click',()=>{                
+                deleteStudent_2(s.name);
+                //alert('Andrew')
+                getStudents();
+            })
+            li.appendChild(btn)
+
+            students_ul.appendChild(li)
+        });
+
+      } catch (err) {
+        output.textContent = 'Error: ' + err;
+      }
+    }
+
+    async function addStudent() {
+
+      const name = document.getElementById('name').value.trim();
+      const uni = document.getElementById('uni').value.trim();
+      if (!name || !uni) return alert('Enter both name and uni');
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, uni })
+        });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        getStudents(); // 🔁 Refresh list
+      } catch (err) {
+        output.textContent = 'Error: ' + err;
+      }
+    }
+
+    async function updateStudent() {
+      const name = document.getElementById('name').value.trim();
+      const uni = document.getElementById('uni').value.trim();
+      if (!name || !uni) return alert('Enter both name and uni');
+
+      try {
+        const res = await fetch(API, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, uni })
+        });
+        const data = await res.json();
+        alert(JSON.stringify(data, null, 2));
+        output.textContent = JSON.stringify(data, null, 2);
+        getStudents(); // 🔁 Refresh list
+      } catch (err) {
+        output.textContent = 'Error: ' + err;
+      }
+    }
+
+    async function deleteStudent() {
+      const name = document.getElementById('name').value.trim();
+      if (!name) return alert('Enter the name to delete');
+
+      try {
+        const res = await fetch(API, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name })
+        });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        getStudents(); // 🔁 Refresh list
+      } catch (err) {
+        output.textContent = 'Error: ' + err;
+      }
+    }
+
+     async function deleteStudent_2(selectedName) {
+     
+      try {
+        const res = await fetch(API, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: selectedName })
+        });
+        const data = await res.json();
+        output.textContent = JSON.stringify(data, null, 2);
+        getStudents(); // 🔁 Refresh list
+      } catch (err) {
+        output.textContent = 'Error: ' + err;
+      }
+    }
+  </script>
+</body>
+</html>
