@@ -116,7 +116,7 @@
           body: JSON.stringify({ name, uni })
         });
         const data = await res.json();
-        alert(JSON.stringify(data, null, 2));
+        //alert(JSON.stringify(data, null, 2));
         output.textContent = JSON.stringify(data, null, 2);
         getStudents(); // 🔁 Refresh list
       } catch (err) {
